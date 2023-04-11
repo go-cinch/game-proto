@@ -15,6 +15,11 @@ option java_outer_classname = "GameProtoV1";
 
 // The game service definition.
 service Game {
+  rpc Idempotent (google.protobuf.Empty) returns (IdempotentReply) {
+    option (google.api.http) = {
+      get: "/idempotent"
+    };
+  }
   rpc CreateGame (CreateGameRequest) returns (google.protobuf.Empty) {
     option (google.api.http) = {
       post: "/game"
@@ -57,6 +62,10 @@ message Page {
 
 message IdsRequest {
   string ids = 1;
+}
+
+message IdempotentReply {
+  string token = 1;
 }
 
 message GameReply {
