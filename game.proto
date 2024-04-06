@@ -2,40 +2,73 @@ syntax = "proto3";
 
 package game.v1;
 
+import "openapiv3/annotations.proto";
 import "google/api/annotations.proto";
+import "google/api/field_behavior.proto";
 import "google/protobuf/empty.proto";
-// the validate rules:
-// https://github.com/envoyproxy/protoc-gen-validate
-import "validate/validate.proto";
+import "cinch/params/params.proto";
 
 option go_package = "api/game;game";
 option java_multiple_files = true;
 option java_package = "game.v1";
 option java_outer_classname = "GameProtoV1";
 
-// The game service definition.
-service Game {
-  rpc Idempotent (google.protobuf.Empty) returns (IdempotentReply) {
-    option (google.api.http) = {
-      get: "/idempotent"
-    };
+option (openapi.v3.document) = {
+  info: {
+    title: "Game service";
+    version: "1.0.0";
+    description: "This is game service docs";
   }
+  components: {
+    security_schemes: {
+      additional_properties: [
+        {
+          name: "BearerAuth";
+          value: {
+            security_scheme: {
+              type: "http";
+              scheme: "bearer";
+            }
+          }
+        }
+      ]
+    }
+  }
+  security: [
+    {
+      additional_properties: [
+        {
+          name: "BearerAuth";
+          value: {
+            value: []
+          }
+        }
+      ]
+    }
+  ]
+};
+
+service Game {
+  // create one Game record
   rpc CreateGame (CreateGameRequest) returns (google.protobuf.Empty) {
     option (google.api.http) = {
       post: "/game"
       body: "*"
     };
   }
+  // query one Game record
   rpc GetGame (GetGameRequest) returns (GetGameReply) {
     option (google.api.http) = {
       get: "/game/{id}"
     };
   }
+  // query Game list by page
   rpc FindGame (FindGameRequest) returns (FindGameReply) {
     option (google.api.http) = {
       get: "/game"
     };
   }
+  // update one Game record by id
   rpc UpdateGame (UpdateGameRequest) returns (google.protobuf.Empty) {
     option (google.api.http) = {
       put: "/game/{id}"
@@ -46,62 +79,43 @@ service Game {
       }
     };
   }
-  rpc DeleteGame (IdsRequest) returns (google.protobuf.Empty) {
+  // delete one or more Game record by id
+  rpc DeleteGame (params.IdsRequest) returns (google.protobuf.Empty) {
     option (google.api.http) = {
-      delete: "/game/{ids}"
+      delete: "/game"
     };
   }
-}
-
-message Page {
-  uint64 num = 1;
-  uint64 size = 2;
-  int64 total = 3;
-  bool disable = 4;
-}
-
-message IdsRequest {
-  string ids = 1;
-}
-
-message IdempotentReply {
-  string token = 1;
 }
 
 message GameReply {
   uint64 id = 1;
   string name = 2;
-  int32 age = 3;
 }
 
 message CreateGameRequest {
-  string name = 1 [(validate.rules).string = {min_len: 2, max_len: 50}]; // the name of string must be between 2 and 50 character
-  int32 age = 2 [(validate.rules).int32 = {gte: 0}];                     // the age of int32 must be >= 0
+  string name = 1 [(google.api.field_behavior) = REQUIRED];
 }
 
 message GetGameRequest {
-  uint64 id = 1;
+  uint64 id = 1 [(google.api.field_behavior) = REQUIRED];
 }
 
 message GetGameReply {
   uint64 id = 1;
   string name = 2;
-  int32 age = 3;
 }
 
 message FindGameRequest {
-  Page page = 1;
+  params.Page page = 1;
   optional string name = 2;
-  optional int32 age = 3;
 }
 
 message FindGameReply {
-  Page page = 1;
+  params.Page page = 1;
   repeated GameReply list = 2;
 }
 
 message UpdateGameRequest {
-  uint64 id = 1;
-  optional string name = 2 [(validate.rules).string = {min_len: 2, max_len: 50}]; // the name of string must be between 2 and 50 character
-  optional int32 age = 3 [(validate.rules).int32 = {gte: 0}];                     // the age of int32 must be >= 0
+  uint64 id = 1 [(google.api.field_behavior) = REQUIRED];
+  optional string name = 2;
 }
