@@ -52,29 +52,29 @@ service Game {
   // create one Game record
   rpc CreateGame (CreateGameRequest) returns (google.protobuf.Empty) {
     option (google.api.http) = {
-      post: "/game"
+      post: "/game/create"
       body: "*"
     };
   }
   // query one Game record
   rpc GetGame (GetGameRequest) returns (GetGameReply) {
     option (google.api.http) = {
-      get: "/game/{id}"
+      get: "/game/get"
     };
   }
   // query Game list by page
   rpc FindGame (FindGameRequest) returns (FindGameReply) {
     option (google.api.http) = {
-      get: "/game"
+      get: "/game/list"
     };
   }
   // update one Game record by id
   rpc UpdateGame (UpdateGameRequest) returns (google.protobuf.Empty) {
     option (google.api.http) = {
-      put: "/game/{id}"
+      put: "/game/update"
       body: "*",
       additional_bindings {
-        patch: "/game/{id}",
+        patch: "/game/update",
         body: "*",
       }
     };
@@ -82,7 +82,7 @@ service Game {
   // delete one or more Game record by id
   rpc DeleteGame (params.IdsRequest) returns (google.protobuf.Empty) {
     option (google.api.http) = {
-      delete: "/game"
+      delete: "/game/delete"
     };
   }
 }
